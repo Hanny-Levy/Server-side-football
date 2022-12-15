@@ -10,14 +10,24 @@ public class UserObject {
     @Column
     public int id;
 
+
     @Column
     private String username;
 
-    @Column
-    private String password;
 
     @Column
     private String token;
+
+
+
+    public UserObject(String username, String token) {
+        this.username = username;
+        this.token = token;
+    }
+
+    public UserObject() {
+
+    }
 
     public String getUsername() {
         return username;
@@ -26,15 +36,6 @@ public class UserObject {
     public void setUsername(String username) {
         this.username = username;
     }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getToken() {
         return token;
     }
@@ -43,8 +44,7 @@ public class UserObject {
         this.token = token;
     }
 
-    public void addPost (String post) {
-    }
+
 
     public int getId() {
         return id;

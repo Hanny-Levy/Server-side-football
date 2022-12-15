@@ -1,6 +1,6 @@
 package com.dev;
 
-import com.dev.objects.NoteObject;
+import com.dev.objects.TeamObject;
 import com.dev.objects.UserObject;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -28,7 +28,7 @@ public class TestConfig {
     public Properties dataSource() throws Exception {
         Properties settings = new Properties();
         settings.put(Environment.DRIVER, "com.mysql.jdbc.Driver");
-        settings.put(Environment.URL, "jdbc:mysql://localhost:3306/first_project?useSSL=false&amp;useUnicode=true&amp;characterEncoding=utf8");
+        settings.put(Environment.URL, "jdbc:mysql://localhost:3306/football_project?useSSL=false&amp;useUnicode=true&amp;characterEncoding=utf8");
         settings.put(Environment.USER, "root");
         settings.put(Environment.PASS, "1234");
         settings.put(Environment.DIALECT, "org.hibernate.dialect.MySQL5Dialect");
@@ -48,7 +48,7 @@ public class TestConfig {
             configuration.addAnnotatedClass(clazz);
         }
         configuration.addAnnotatedClass(UserObject.class);
-        configuration.addAnnotatedClass(NoteObject.class);
+        configuration.addAnnotatedClass(TeamObject.class);
 
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties()).build();
