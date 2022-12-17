@@ -38,6 +38,10 @@ public class Persist {
             System.out.println();
             addTeams();
             addAdminUser();
+            //findTeamByName("West Ham United");
+            updateGameResult("Manchester United","Manchester City",1,4,6,5);
+
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -136,7 +140,24 @@ public class Persist {
 
     }
 
+    public boolean updateGameResult(String team1 , String team2 ,int goalsForTeam1 ,int goalsAgainstTeam1,int goalsForTeam2,int goalsAgainstTeam2){
+        TeamObject firstTeam= findTeamByName(team1);
+        firstTeam.setGoalsFor(firstTeam.getGoalsFor()+goalsForTeam1);
+        firstTeam.setGoalAgainst(firstTeam.getGoalAgainst()+goalsAgainstTeam1);
+        sessionFactory.openSession().save(firstTeam);
+        TeamObject secondTeam=findTeamByName(team2);
+        secondTeam.setGoalsFor(secondTeam.getGoalsFor()+goalsForTeam2);
+        secondTeam.setGoalAgainst(secondTeam.getGoalAgainst()+goalsAgainstTeam2);
+        sessionFactory.openSession().save(secondTeam);
+        return true;
     }
+
+     public TeamObject findTeamByName(String name) {
+        return (TeamObject) sessionFactory.openSession().createQuery("FROM TeamObject WHERE name =: name").setParameter("name",name).list().get(0);
+
+    }
+
+}
 
 
 

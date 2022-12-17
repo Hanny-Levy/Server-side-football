@@ -151,6 +151,10 @@ public class TestController {
 //    }
 
 
+//    @RequestMapping(value = "/updateLeagueTeam", method = {RequestMethod.POST})
+//    public boolean updateLeagueTeam(String team1 , String team2 ,int goalsForTeam1 ,int goalsAgainstTeam1,int goalsForTeam2,int goalsAgainstTeam2){
+//       return persist.updateGameResult(team1 ,team2 ,goalsForTeam1 ,goalsAgainstTeam1,goalsForTeam2,goalsAgainstTeam2);
+//    }
 
 
 }
