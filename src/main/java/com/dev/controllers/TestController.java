@@ -2,6 +2,9 @@ package com.dev.controllers;
 
 import com.dev.objects.TeamObject;
 
+import com.dev.objects.UserObject;
+import com.dev.responses.BasicResponse;
+import com.dev.responses.SignInReponse;
 import com.dev.utils.Persist;
 import com.dev.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,23 +61,22 @@ public class TestController {
 
 
 
-//    @RequestMapping(value = "/sign-in", method = RequestMethod.POST)
-//    public BasicResponse signIn (String username, String password) {
-//        BasicResponse basicResponse = null;
-//        String token = createHash(username, password);
-//        token = persist.getUserByCreds(username, token);
-//        if (token == null) {
-//            if (persist.usernameAvailable(username)) {
-//                basicResponse = new BasicResponse(false, 1);
-//            } else {
-//                basicResponse = new BasicResponse(false, 2);
-//            }
-//        } else {
-//            User user = persist.getUserByToken(token);
-//            basicResponse = new SignInReponse(true, null, user);
-//        }
-//        return basicResponse;
-//    }
+    @RequestMapping(value = "/sign-in", method = {RequestMethod.POST,RequestMethod.GET})
+    public BasicResponse signIn (String username, String password) {
+        BasicResponse basicResponse = null;
+        String token = createHash(username, password);
+        UserObject user = persist.getUserByToken(token);
+        if (user == null) {
+            if (persist.usernameAvailable(username)) {
+                basicResponse = new BasicResponse(false, 1);
+            } else {
+                basicResponse = new BasicResponse(false, 2);
+            }
+        } else {
+            basicResponse = new SignInReponse(true, null, user);
+        }
+        return basicResponse;
+    }
 
 //    @RequestMapping(value = "/create-account", method = {RequestMethod.GET, RequestMethod.POST})
 //    public User createAccount (String username, String password) {

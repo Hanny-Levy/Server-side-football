@@ -37,83 +37,29 @@ public class Persist {
             System.out.println("Successfully connected to DB");
             System.out.println();
             addTeams();
-            addAdminUser();
-            //findTeamByName("West Ham United");
             updateGameResult("Manchester United","Manchester City",1,4,6,5);
-
+            addAdminUser();
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+    public boolean usernameAvailable (String username) {
+        boolean available;
+        List<UserObject> users = sessionFactory.openSession().createQuery("FROM UserObject WHERE username=:username").setParameter("username",username).list();
+        available= users.size() == 0;
+        return available;
+    }
+    public UserObject getUserByToken (String token) {
+        UserObject userObject=null;
+        List <UserObject> userObjects =  sessionFactory.openSession().createQuery("FROM  UserObject where token=:token").setParameter("token",token).list();
+        if (userObjects.size()!=0)
+            userObject=userObjects.get(0);
 
+        return userObject;
 
-
-    public List<UserObject> getAllUsersHibernate () {
-        Session session = sessionFactory.openSession();
-        List<UserObject> userObjects = session.createQuery("FROM UserObject ").list();
-        session.close();
-        return userObjects;
     }
 
-//    public void addUser (String username, String token) {
-//        try {
-//            PreparedStatement preparedStatement =
-//                    this.connection
-//                            .prepareStatement("INSERT INTO users (username, token) VALUE (?,?)");
-//            preparedStatement.setString(1, username);
-//            preparedStatement.setString(2, token);
-//            preparedStatement.executeUpdate();
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
-//    public boolean usernameAvailable (String username) {
-//      boolean available = sessionFactory.openSession().createQuery("FROM UserObject WHERE  username = :username")
-//              .setParameter("username", username)
-//              .list().size()==0;
-//        return available;
-//    }
-//
-//    public UserObject getUserByToken (String token) {
-//        UserObject user = null;
-//        try {
-//            PreparedStatement preparedStatement = this.connection
-//                    .prepareStatement(
-//                            "SELECT id, username FROM users WHERE token = ?");
-//            preparedStatement.setString(1, token);
-//            ResultSet resultSet = preparedStatement.executeQuery();
-//            if (resultSet.next()) {
-//                int id = resultSet.getInt("id");
-//                String username = resultSet.getString("username");
-//                user = new UserObject(username, token);
-//                user.setId(id);
-//            }
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//        return user;
-//    }
-
-
-
-//    public String getUserByCreds (String username, String token) {
-//        String response = null;
-//        try {
-//            PreparedStatement preparedStatement = this.connection.prepareStatement(
-//                    "SELECT * FROM users WHERE username = ? AND token = ?");
-//            preparedStatement.setString(1, username);
-//            preparedStatement.setString(2, token);
-//            ResultSet resultSet = preparedStatement.executeQuery();
-//            if (resultSet.next()) {
-//                response = token;
-//            }
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//        return response;
-//    }
 
     public void addTeams(){
        String [] teamsNames = new String[]{"AFC Bournemouth", "Arsenal", "Brentford", "Chelsea", "Everton", "Fulham", "Leeds United", "Leicester City", "Liverpool", "Manchester City", "Manchester United", "West Ham United"};
@@ -126,10 +72,10 @@ public class Persist {
         }
 
 
-    public void addAdminUser(){
-        List <UserObject> userObjects=sessionFactory.openSession().createQuery("FROM UserObject ").list();
-        if (userObjects.size()==0) {
-            sessionFactory.openSession().save(new UserObject("admin","B2CAAE52C8C6A94E3D7423DB20BD083F"));
+    public void addAdminUser() {
+        List<UserObject> userObjects = sessionFactory.openSession().createQuery("FROM UserObject ").list();
+        if (userObjects.size() == 0) {
+            sessionFactory.openSession().save(new UserObject("admin@", "F842CBD9D7D0B3F80F455498B229671F"));
         }
 
     }
@@ -156,6 +102,9 @@ public class Persist {
         return (TeamObject) sessionFactory.openSession().createQuery("FROM TeamObject WHERE name =: name").setParameter("name",name).list().get(0);
 
     }
+
+
+
 
 }
 
