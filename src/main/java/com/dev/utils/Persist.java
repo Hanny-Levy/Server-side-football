@@ -8,11 +8,14 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.Query;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 @Component
 public class Persist {
@@ -23,15 +26,13 @@ public class Persist {
     private UserObject user;
 
     @Autowired
-    public Persist (SessionFactory sf) {
+    public Persist(SessionFactory sf) {
         this.sessionFactory = sf;
     }
 
 
-
-
     @PostConstruct
-    public void createConnectionToDatabase () {
+    public void createConnectionToDatabase() {
         try {
             this.connection = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/first_project", "root", "1234");
@@ -62,15 +63,15 @@ public class Persist {
     }
 
 
-    public void addTeams(){
-       String [] teamsNames = new String[]{"AFC Bournemouth", "Arsenal", "Brentford", "Chelsea", "Everton", "Fulham", "Leeds United", "Leicester City", "Liverpool", "Manchester City", "Manchester United", "West Ham United"};
+    public void addTeams() {
+        String[] teamsNames = new String[]{"AFC Bournemouth", "Arsenal", "Brentford", "Chelsea", "Everton", "Fulham", "Leeds United", "Leicester City", "Liverpool", "Manchester City", "Manchester United", "West Ham United"};
 
-    List<TeamObject> teamObjects = sessionFactory.openSession().createQuery("FROM TeamObject ").list();
-        if (teamObjects.size()==0 )
-        for (int i = 0; i < teamsNames.length; i++) {
-            sessionFactory.openSession().save(new TeamObject(teamsNames[i]));
-        }
-        }
+        List<TeamObject> teamObjects = sessionFactory.openSession().createQuery("FROM TeamObject ").list();
+        if (teamObjects.size() == 0)
+            for (int i = 0; i < teamsNames.length; i++) {
+                sessionFactory.openSession().save(new TeamObject(teamsNames[i]));
+            }
+    }
 
 
     public void addAdminUser() {
@@ -81,9 +82,9 @@ public class Persist {
 
     }
 
-    public List<TeamObject> getTeams (){
+    public List<TeamObject> getTeams() {
         List<TeamObject> teamObjectList = sessionFactory.openSession().createQuery("FROM TeamObject ").list();
-        return teamObjectList ;
+        return teamObjectList;
 
     }
 
