@@ -32,17 +32,17 @@ public class TestController {
     private Persist persist;
 
     @PostConstruct
-    public void init () {
+    public void init() {
     }
 
 
     @RequestMapping(value = "/check", method = RequestMethod.GET)
-    public String getCheck () {
+    public String getCheck() {
         return "Success from get request";
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.POST)
-    public String postCheck () {
+    public String postCheck() {
         return "Success from post request";
     }
 
@@ -55,53 +55,36 @@ public class TestController {
 
 
     @RequestMapping(value = "/test", method = {RequestMethod.GET, RequestMethod.POST})
-    public Object test () {
+    public Object test() {
         return new Date().toString();
     }
 
 
-
-    @RequestMapping(value = "/sign-in", method = {RequestMethod.POST,RequestMethod.GET})
-    public BasicResponse signIn (String username, String password) {
-        BasicResponse basicResponse = null;
-        String token = createHash(username, password);
+    @RequestMapping(value = "/sign-in", method = {RequestMethod.POST, RequestMethod.GET})
+    public BasicResponse signIn(String username, String password) {
+        BasicResponse basicResponse;
+        String token ="13B151B1C4898434779FD69404F58CF3";
+        System.out.println(token);
         UserObject user = persist.getUserByToken(token);
-        if (user == null) {
+     //   System.out.println(user);
+        if (user==null) {
             if (persist.usernameAvailable(username)) {
+                //for problem with usename
                 basicResponse = new BasicResponse(false, 1);
             } else {
+                //problem with password
                 basicResponse = new BasicResponse(false, 2);
             }
         } else {
+
             basicResponse = new SignInReponse(true, null, user);
         }
         return basicResponse;
     }
 
-//    @RequestMapping(value = "/create-account", method = {RequestMethod.GET, RequestMethod.POST})
-//    public User createAccount (String username, String password) {
-//        User newAccount = null;
-//        if (utils.validateUsername(username)) {
-//            if (utils.validatePassword(password)) {
-//                if (persist.usernameAvailable(username)) {
-//                    String token = createHash(username, password);
-//                    newAccount = new User(username, token);
-//                    persist.addUser(username, token);
-//                } else {
-//                    System.out.println("username already exits");
-//                }
-//            } else {
-//                System.out.println("password is invalid");
-//            }
-//        } else {
-//            System.out.println("username is invalid");
-//        }
-//        return newAccount;
-//    }
-
 
     @RequestMapping(value = "/getToken", method = {RequestMethod.GET})
-    public String createHash (String username, String password) {
+    public String createHash(String username, String password) {
         String raw = String.format("%s_%s", username, password);
         String myHash = null;
         try {
@@ -118,45 +101,10 @@ public class TestController {
     }
 
     @RequestMapping(value = "/getAllTeams", method = {RequestMethod.GET, RequestMethod.POST})
-    public List<TeamObject> getAllTeams (){
-       return persist.getTeams();
+    public List<TeamObject> getAllTeams() {
+        return persist.getTeams();
+
     }
-
-//    private boolean checkIfUsernameExists (String username) {
-//        boolean exists = false;
-//        for (User user : this.myUsers) {
-//            if (user.getUsername().equals(username)) {
-//                exists = true;
-//                break;
-//            }
-//        }
-//
-//        return exists;
-//    }
-
-
-
-
-
-
-//    private User getUserByToken (String token) {
-//        User matchedUser = null;
-//        if (token != null) {
-//            for (User user : this.myUsers) {
-//                if (user.getToken().equals(token)) {
-//                    matchedUser = user;
-//                    break;
-//                }
-//            }
-//        }
-//        return matchedUser;
-//    }
-
-
-//    @RequestMapping(value = "/updateLeagueTeam", method = {RequestMethod.POST})
-//    public boolean updateLeagueTeam(String team1 , String team2 ,int goalsForTeam1 ,int goalsAgainstTeam1,int goalsForTeam2,int goalsAgainstTeam2){
-//       return persist.updateGameResult(team1 ,team2 ,goalsForTeam1 ,goalsAgainstTeam1,goalsForTeam2,goalsAgainstTeam2);
-//    }
-
-
 }
+
+

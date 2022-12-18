@@ -35,12 +35,13 @@ public class Persist {
     public void createConnectionToDatabase() {
         try {
             this.connection = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/first_project", "root", "1234");
+                    "jdbc:mysql://localhost:3306/football_project", "root", "1234");
             System.out.println("Successfully connected to DB");
             System.out.println();
             addTeams();
-            updateGameResult("Manchester United","Manchester City",1,4,6,5);
             addAdminUser();
+            updateGameResult("Manchester United","Manchester City",1,4,6,5);
+
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -54,9 +55,10 @@ public class Persist {
     }
     public UserObject getUserByToken (String token) {
         UserObject userObject=null;
-        List <UserObject> userObjects =  sessionFactory.openSession().createQuery("FROM  UserObject where token=:token").setParameter("token",token).list();
-        if (userObjects.size()!=0)
+        List <UserObject> userObjects =  sessionFactory.openSession().createQuery("FROM  UserObject WHERE   UserObject.token = :token").setParameter("token",token).list();
+        if (userObjects.size()!=0){
             userObject=userObjects.get(0);
+        }
 
         return userObject;
 

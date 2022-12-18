@@ -1,29 +1,77 @@
 package com.dev.objects;
 
-import java.util.Date;
+import org.hibernate.annotations.ManyToAny;
 
+import javax.persistence.*;
+import java.util.Set;
+
+@Entity
+@Table(name = "games")
 
 public class GameObject {
-    private String team1;
-    private String team2;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
+    private int id;
 
 
-    public GameObject(String team1, String team2) {
-        // Initialize the game with the names of the teams and a score of 0-0.
-        this.team1 = team1;
+
+    @ManyToOne
+    @JoinColumn(name = "teamId")
+    @Column
+    private TeamObject team2;
+
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "GAME_TABLE",
+            joinColumns = @JoinColumn(name = "team_id"),
+            inverseJoinColumns = @JoinColumn(name = "team_id")
+    )
+    Set<TeamObject> likedCourses;
+
+
+
+
+
+    @Column
+    private boolean isLive;
+
+    public GameObject(int id, TeamObject team1, TeamObject team2, boolean isLive) {
+        this.id = id;
         this.team2 = team2;
+        this.isLive = isLive;
+    }
+
+    public GameObject() {
 
     }
 
-    public String getTeam1() {
-        return this.team1;
+    public int getId() {
+        return id;
     }
 
-    public String getTeam2() {
-        return this.team2;
+    public void setId(int id) {
+        this.id = id;
     }
 
 
 
+    public TeamObject getTeam2() {
+        return team2;
+    }
+
+    public void setTeam2(TeamObject team2) {
+        this.team2 = team2;
+    }
+
+    public boolean isLive() {
+        return isLive;
+    }
+
+    public void setLive(boolean live) {
+        isLive = live;
+    }
 }
-
