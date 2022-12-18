@@ -5,6 +5,7 @@ import com.dev.objects.TeamObject;
 import com.dev.objects.UserObject;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -87,14 +88,17 @@ public class Persist {
     }
 
     public boolean updateGameResult(String team1 , String team2 ,int goalsForTeam1 ,int goalsAgainstTeam1,int goalsForTeam2,int goalsAgainstTeam2){
+       Session session=sessionFactory.openSession();
+        Transaction transaction=session.beginTransaction();
         TeamObject firstTeam= findTeamByName(team1);
         firstTeam.setGoalsFor(firstTeam.getGoalsFor()+goalsForTeam1);
         firstTeam.setGoalAgainst(firstTeam.getGoalAgainst()+goalsAgainstTeam1);
-        sessionFactory.openSession().save(firstTeam);
+        session.saveOrUpdate(firstTeam);
         TeamObject secondTeam=findTeamByName(team2);
         secondTeam.setGoalsFor(secondTeam.getGoalsFor()+goalsForTeam2);
         secondTeam.setGoalAgainst(secondTeam.getGoalAgainst()+goalsAgainstTeam2);
-        sessionFactory.openSession().save(secondTeam);
+        session.saveOrUpdate(secondTeam);
+        transaction.commit();
         return true;
     }
 
