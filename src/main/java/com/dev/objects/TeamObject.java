@@ -12,7 +12,7 @@ public class TeamObject {
     private int id;
 
     @Column
-    public String name;
+    private String name;
 
     @Column
     private int gamesWon;
