@@ -8,22 +8,20 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.Query;
+import javax.xml.bind.DatatypeConverter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 
 @Component
 public class Persist {
 
     private Connection connection;
-
     private final SessionFactory sessionFactory;
-    private UserObject user;
+
 
     @Autowired
     public Persist(SessionFactory sf) {
@@ -47,20 +45,21 @@ public class Persist {
             e.printStackTrace();
         }
     }
-    public boolean usernameAvailable (String username) {
-        boolean available;
-        List<UserObject> users = sessionFactory.openSession().createQuery("FROM UserObject WHERE username=:username").setParameter("username",username).list();
-        available= users.size() == 0;
-        return available;
+    public boolean usernameExist(String username) {
+        boolean exist;
+      List users = sessionFactory.openSession().createQuery("FROM UserObject WHERE username=: username").setParameter("username",username).list();
+        exist=users.size() != 0;
+        return exist;
     }
-    public UserObject getUserByToken (String token) {
-        UserObject userObject=null;
-        List <UserObject> userObjects =  sessionFactory.openSession().createQuery("FROM  UserObject WHERE   UserObject.token = :token").setParameter("token",token).list();
-        if (userObjects.size()!=0){
-            userObject=userObjects.get(0);
-        }
-
-        return userObject;
+    public UserObject isUserExist (String username,String token) {
+        UserObject user = null;
+        List usersByName = sessionFactory.openSession().createQuery("FROM UserObject WHERE username=:username").setParameter("username",username).list();
+        List userByToken= sessionFactory.openSession().createQuery("FROM UserObject WHERE token=: token").setParameter("token",token).list();
+       if (usersByName.size()!=0 && userByToken.size()!=0){
+           user= (UserObject) usersByName.get(0);
+       }
+        
+        return user;
 
     }
 
@@ -77,12 +76,30 @@ public class Persist {
 
 
     public void addAdminUser() {
+        String username="admin@";
+        String token=createHash(username,"123456")    ;
         List<UserObject> userObjects = sessionFactory.openSession().createQuery("FROM UserObject ").list();
         if (userObjects.size() == 0) {
-            sessionFactory.openSession().save(new UserObject("admin@", "F842CBD9D7D0B3F80F455498B229671F"));
+            sessionFactory.openSession().save(new UserObject(username,token));
+            System.out.println("\n"+"successfully added"+"\n");
         }
 
     }
+    public String createHash(String username, String password) {
+        String raw = String.format("%s_%s", username, password);
+        String myHash = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(raw.getBytes());
+            byte[] digest = md.digest();
+            myHash = DatatypeConverter
+                    .printHexBinary(digest).toUpperCase();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+        return myHash;
+    }
+
 
     public List<TeamObject> getTeams() {
         List<TeamObject> teamObjectList = sessionFactory.openSession().createQuery("FROM TeamObject ").list();
