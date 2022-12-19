@@ -24,12 +24,10 @@ public class Persist {
     private Connection connection;
     private final SessionFactory sessionFactory;
 
-
     @Autowired
     public Persist(SessionFactory sf) {
         this.sessionFactory = sf;
     }
-
 
     @PostConstruct
     public void createConnectionToDatabase() {
@@ -41,21 +39,19 @@ public class Persist {
             addTeams();
             addAdminUser();
             System.out.println();
-            //List games=addGameTable();
-            //System.out.println("\n"+games.size()+"\n");
-           // updateGameResult("Manchester United","Manchester City",1,4,6,5);
-
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
     public boolean usernameExist(String username) {
         boolean exist;
       List users = sessionFactory.openSession().createQuery("FROM UserObject WHERE username=: username").setParameter("username",username).list();
         exist=users.size() != 0;
         return exist;
     }
+
     public UserObject isUserExist (String username,String token) {
         UserObject user = null;
         List usersByName = sessionFactory.openSession().createQuery("FROM UserObject WHERE username=:username").setParameter("username",username).list();
@@ -63,22 +59,17 @@ public class Persist {
        if (usersByName.size()!=0 && userByToken.size()!=0){
            user= (UserObject) usersByName.get(0);
        }
-        
         return user;
-
     }
-
 
     public void addTeams() {
         String[] teamsNames = new String[]{"AFC Bournemouth", "Arsenal", "Brentford", "Chelsea", "Everton", "Fulham", "Leeds United", "Leicester City", "Liverpool", "Manchester City", "Manchester United", "West Ham United"};
-
         List<TeamObject> teamObjects = sessionFactory.openSession().createQuery("FROM TeamObject ").list();
         if (teamObjects.size() == 0)
             for (int i = 0; i < teamsNames.length; i++) {
                 sessionFactory.openSession().save(new TeamObject(teamsNames[i]));
             }
     }
-
 
     public void addAdminUser() {
         String username="admin@";
@@ -88,8 +79,8 @@ public class Persist {
             sessionFactory.openSession().save(new UserObject(username,token));
             System.out.println("\n"+"successfully added"+"\n");
         }
-
     }
+
     public String createHash(String username, String password) {
         String raw = String.format("%s_%s", username, password);
         String myHash = null;
@@ -105,11 +96,9 @@ public class Persist {
         return myHash;
     }
 
-
     public List<TeamObject> getTeams() {
         List<TeamObject> teamObjectList = sessionFactory.openSession().createQuery("FROM TeamObject ").list();
         return teamObjectList;
-
     }
 
     public boolean updateTeamResult(String team ,int goalsFor ,int goalsAgainst,GameResult gameResult){
@@ -134,15 +123,19 @@ public class Persist {
         return true;
     }
 
-
+    public String findTeamNameById(int id) {
+        TeamObject team = (TeamObject) sessionFactory.openSession().createQuery("FROM TeamObject WHERE id =: id").setParameter("id",id).list().get(0);
+        return team.getName();
+    }
 
      public TeamObject findTeamByName(String name) {
         return (TeamObject) sessionFactory.openSession().createQuery("FROM TeamObject WHERE name =: name").setParameter("name",name).list().get(0);
-
     }
-    public List<GameObject> getAllLiveGames(boolean isLive){
+
+    public List<GameObject> getGamesByStatus(boolean isLive){
        return sessionFactory.openSession().createQuery("FROM GameObject WHERE isLive= : isLive").setParameter("isLive",isLive).list();
     }
+
     public int findTeamIdByName(String teamName){
         int teamId=0;
         List<TeamObject> allTeams=getTeams();
@@ -150,11 +143,9 @@ public class Persist {
             if (team.getName().equals(teamName)){
                teamId= team.getId();
             }
-
         }
      return teamId;
     }
-
 
     public boolean addToGameTable(String team1 , String team2 ,int goalsForTeam1 ,int goalsAgainstTeam1,int goalsForTeam2,int goalsAgainstTeam2){
         GameObject game=new GameObject(findTeamIdByName(team1),findTeamIdByName(team2),goalsForTeam1,goalsAgainstTeam1,goalsForTeam2,goalsAgainstTeam2,true);
@@ -191,14 +182,10 @@ public class Persist {
             updateTeamResult(team2,goalsForTeam2,goalsAgainstTeam2,gameResult);
         }
         return true;
-
     }
-
-
-
-
-
 }
+
+
 
 
 

@@ -10,6 +10,7 @@ public class SignInReponse extends BasicResponse{
         this.user = user;
     }
 
+
     public UserObject getUser() {
         return user;
     }
