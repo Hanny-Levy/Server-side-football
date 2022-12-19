@@ -64,11 +64,23 @@ public class TestController {
     }
 
 
-
     @RequestMapping(value = "/getAllTeams", method = {RequestMethod.GET, RequestMethod.POST})
     public List<TeamObject> getAllTeams() {
         return persist.getTeams();
 
+    }
+    @RequestMapping(value = "/add-new-game",method = {RequestMethod.POST})
+    public boolean addNewGame(String team1, String team2, int team1GoalsFor, int team1Against, int team2GoalsFor, int team2Against) {
+       return persist.addToGameTable(team1,team2,team1GoalsFor,team1Against,team2GoalsFor,team2Against);
+
+    }
+   @RequestMapping(value = "/update-live-game",method = RequestMethod.POST)
+    public boolean updateGame(String team1, String team2, int team1GoalsFor, int team1Against, int team2GoalsFor, int team2Against){
+        return persist.updateLiveGame(team1,team2,team1GoalsFor,team1Against,team2GoalsFor,team2Against);
+   }
+    @RequestMapping(value = "/update-final-game",method = {RequestMethod.POST})
+    public boolean updateFinalGameResult(String team1, String team2, int team1GoalsFor, int team1Against, int team2GoalsFor, int team2Against){
+        return persist.updateFinalGameResult(team1,team2,team1GoalsFor,team1Against,team2GoalsFor,team2Against);
     }
 
 }

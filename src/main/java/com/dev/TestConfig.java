@@ -1,5 +1,6 @@
 package com.dev;
 
+import com.dev.objects.GameObject;
 import com.dev.objects.TeamObject;
 import com.dev.objects.UserObject;
 import org.hibernate.SessionFactory;
@@ -11,6 +12,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
+
+import javax.persistence.GeneratedValue;
 import java.util.Properties;
 import java.util.Set;
 
@@ -49,6 +52,7 @@ public class TestConfig {
         }
         configuration.addAnnotatedClass(UserObject.class);
         configuration.addAnnotatedClass(TeamObject.class);
+        configuration.addAnnotatedClass(GameObject.class);
 
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties()).build();

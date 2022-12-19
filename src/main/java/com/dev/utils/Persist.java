@@ -1,6 +1,8 @@
 
 package com.dev.utils;
 
+import com.dev.objects.GameObject;
+import com.dev.objects.GameResult;
 import com.dev.objects.TeamObject;
 import com.dev.objects.UserObject;
 import org.hibernate.Session;
@@ -38,7 +40,10 @@ public class Persist {
             System.out.println();
             addTeams();
             addAdminUser();
-            updateGameResult("Manchester United","Manchester City",1,4,6,5);
+            System.out.println();
+            //List games=addGameTable();
+            //System.out.println("\n"+games.size()+"\n");
+           // updateGameResult("Manchester United","Manchester City",1,4,6,5);
 
 
         } catch (SQLException e) {
@@ -107,25 +112,88 @@ public class Persist {
 
     }
 
-    public boolean updateGameResult(String team1 , String team2 ,int goalsForTeam1 ,int goalsAgainstTeam1,int goalsForTeam2,int goalsAgainstTeam2){
-       Session session=sessionFactory.openSession();
+    public boolean updateTeamResult(String team ,int goalsFor ,int goalsAgainst,GameResult gameResult){
+        Session session=sessionFactory.openSession();
         Transaction transaction=session.beginTransaction();
-        TeamObject firstTeam= findTeamByName(team1);
-        firstTeam.setGoalsFor(firstTeam.getGoalsFor()+goalsForTeam1);
-        firstTeam.setGoalAgainst(firstTeam.getGoalAgainst()+goalsAgainstTeam1);
-        session.saveOrUpdate(firstTeam);
-        TeamObject secondTeam=findTeamByName(team2);
-        secondTeam.setGoalsFor(secondTeam.getGoalsFor()+goalsForTeam2);
-        secondTeam.setGoalAgainst(secondTeam.getGoalAgainst()+goalsAgainstTeam2);
-        session.saveOrUpdate(secondTeam);
+        TeamObject currentTeam= findTeamByName(team);
+        currentTeam.setGoalsFor(currentTeam.getGoalsFor()+goalsFor);
+        currentTeam.setGoalAgainst(currentTeam.getGoalAgainst()+goalsAgainst);
+        switch(gameResult){
+            case WIN:
+                currentTeam.setGamesWon(currentTeam.getGamesWon()+1);
+                break;
+            case LOSE:
+                currentTeam.setGamesLost(currentTeam.getGamesLost()+1);
+                break;
+            case DRAWN:
+                currentTeam.setGameDrawn(currentTeam.getGameDrawn()+1);
+                break;
+        }
+        session.saveOrUpdate(currentTeam);
         transaction.commit();
         return true;
     }
+
+
 
      public TeamObject findTeamByName(String name) {
         return (TeamObject) sessionFactory.openSession().createQuery("FROM TeamObject WHERE name =: name").setParameter("name",name).list().get(0);
 
     }
+    public List<GameObject> getAllLiveGames(boolean isLive){
+       return sessionFactory.openSession().createQuery("FROM GameObject WHERE isLive= : isLive").setParameter("isLive",isLive).list();
+    }
+    public int findTeamIdByName(String teamName){
+        int teamId=0;
+        List<TeamObject> allTeams=getTeams();
+        for (TeamObject team:allTeams) {
+            if (team.getName().equals(teamName)){
+               teamId= team.getId();
+            }
+
+        }
+     return teamId;
+    }
+
+
+    public boolean addToGameTable(String team1 , String team2 ,int goalsForTeam1 ,int goalsAgainstTeam1,int goalsForTeam2,int goalsAgainstTeam2){
+        GameObject game=new GameObject(findTeamIdByName(team1),findTeamIdByName(team2),goalsForTeam1,goalsAgainstTeam1,goalsForTeam2,goalsAgainstTeam2,true);
+        sessionFactory.openSession().save(game);
+        return true;
+    }
+
+    public boolean updateLiveGame(String team1 , String team2 ,int goalsForTeam1 ,int goalsAgainstTeam1,int goalsForTeam2,int goalsAgainstTeam2){
+        Session session=sessionFactory.openSession();
+        Transaction transaction=session.beginTransaction();
+        GameObject game=new GameObject(findTeamIdByName(team1),findTeamIdByName(team2),goalsForTeam1,goalsAgainstTeam1,goalsForTeam2,goalsAgainstTeam2,true);
+        session.saveOrUpdate(game);
+        transaction.commit();
+        return true;
+    }
+
+    public boolean updateFinalGameResult(String team1 , String team2 ,int goalsForTeam1 ,int goalsAgainstTeam1,int goalsForTeam2,int goalsAgainstTeam2){
+        Session session=sessionFactory.openSession();
+        Transaction transaction=session.beginTransaction();
+        GameObject game=new GameObject(findTeamIdByName(team1),findTeamIdByName(team2),goalsForTeam1,goalsAgainstTeam1,goalsForTeam2,goalsAgainstTeam2,false);
+        session.saveOrUpdate(game);
+        transaction.commit();
+        GameResult gameResult=null;
+        if (goalsForTeam1==goalsAgainstTeam2){
+            gameResult=GameResult.DRAWN;
+        } else
+            gameResult=GameResult.WIN;
+
+         if (goalsForTeam1 - goalsAgainstTeam1 > goalsForTeam2 - goalsAgainstTeam2){
+            updateTeamResult(team1,goalsForTeam1,goalsAgainstTeam1,gameResult);
+            updateTeamResult(team2,goalsForTeam2,goalsAgainstTeam2,GameResult.LOSE);
+        }else{
+            updateTeamResult(team1,goalsForTeam1,goalsAgainstTeam1,GameResult.LOSE);
+            updateTeamResult(team2,goalsForTeam2,goalsAgainstTeam2,gameResult);
+        }
+        return true;
+
+    }
+
 
 
 
