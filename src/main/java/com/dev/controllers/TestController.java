@@ -1,5 +1,6 @@
 package com.dev.controllers;
 
+import com.dev.objects.GameObject;
 import com.dev.objects.TeamObject;
 
 import com.dev.objects.UserObject;
@@ -78,10 +79,27 @@ public class TestController {
     public boolean updateGame(String team1, String team2, int team1GoalsFor, int team1Against, int team2GoalsFor, int team2Against){
         return persist.updateLiveGame(team1,team2,team1GoalsFor,team1Against,team2GoalsFor,team2Against);
    }
-    @RequestMapping(value = "/update-final-game",method = {RequestMethod.POST})
+    @RequestMapping(value = "/update-final-game",method = {RequestMethod.POST,RequestMethod.GET})
     public boolean updateFinalGameResult(String team1, String team2, int team1GoalsFor, int team1Against, int team2GoalsFor, int team2Against){
         return persist.updateFinalGameResult(team1,team2,team1GoalsFor,team1Against,team2GoalsFor,team2Against);
     }
+
+
+    @RequestMapping(value = "/get-all-live-games",method = {RequestMethod.GET})
+    public List<GameObject> getAllLiveGames(){
+        return persist.getGamesByStatus(true);
+    }
+
+    @RequestMapping(value = "/get-all-finished-games",method = {RequestMethod.POST,RequestMethod.GET})
+    public List<GameObject> getAllFinishedGames(){
+        return persist.getGamesByStatus(false);
+    }
+
+    @RequestMapping(value = "/team-name-by-id",method = {RequestMethod.GET})
+    public String getTeamNameById (int id){
+        return persist.findTeamNameById(id);
+    }
+
 
 }
 
