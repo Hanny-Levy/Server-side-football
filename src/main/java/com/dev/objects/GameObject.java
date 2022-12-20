@@ -65,10 +65,9 @@ public class GameObject {
     }
 
 
-
-
-
-
+    public int getTeam2Against() {
+        return team2Against;
+    }
 
     public int getTeam1GoalsFor() {
         return team1GoalsFor;
@@ -76,6 +75,7 @@ public class GameObject {
 
     public void setTeam1GoalsFor(int team1GoalsFor) {
         this.team1GoalsFor = team1GoalsFor;
+        this.team2Against=this.team1GoalsFor ;
     }
 
     public int getTeam1Against() {
@@ -90,6 +90,8 @@ public class GameObject {
 
     public void setTeam2GoalsFor(int team2GoalsFor) {
         this.team2GoalsFor = team2GoalsFor;
+        this.team1Against=this.team2GoalsFor ;
+
     }
 
 

@@ -161,6 +161,8 @@ public class Persist {
         for (GameObject game: liveGames) {
             if((game.getTeam1().equals(team1) && game.getTeam2().equals(team2))||(game.getTeam1().equals(team2) && game.getTeam2().equals(team1))) {
                 currentGame=game;
+                currentGame.setTeam1GoalsFor(goalsForTeam1);
+                currentGame.setTeam2GoalsFor(goalsForTeam2);
             };
         }
         if (currentGame==null )
