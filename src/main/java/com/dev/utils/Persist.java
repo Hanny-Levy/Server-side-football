@@ -147,42 +147,55 @@ public class Persist {
      return teamId;
     }
 
-    public boolean addToGameTable(String team1 , String team2 ,int goalsForTeam1 ,int goalsAgainstTeam1,int goalsForTeam2,int goalsAgainstTeam2){
-        GameObject game=new GameObject(findTeamIdByName(team1),findTeamIdByName(team2),goalsForTeam1,goalsAgainstTeam1,goalsForTeam2,goalsAgainstTeam2,true);
+    public boolean addToGameTable(String team1 , String team2 ,int goalsForTeam1 ,int goalsForTeam2){
+        GameObject game=new GameObject(team1,team2,goalsForTeam1,goalsForTeam2,true);
         sessionFactory.openSession().save(game);
         return true;
     }
 
-    public boolean updateLiveGame(String team1 , String team2 ,int goalsForTeam1 ,int goalsAgainstTeam1,int goalsForTeam2,int goalsAgainstTeam2){
+    public boolean updateLiveGame(String team1 , String team2 ,int goalsForTeam1 ,int goalsForTeam2){
         Session session=sessionFactory.openSession();
         Transaction transaction=session.beginTransaction();
-        GameObject game=new GameObject(findTeamIdByName(team1),findTeamIdByName(team2),goalsForTeam1,goalsAgainstTeam1,goalsForTeam2,goalsAgainstTeam2,true);
-        session.saveOrUpdate(game);
+        GameObject currentGame =null ;
+        List <GameObject> liveGames= getGamesByStatus(true);
+        for (GameObject game: liveGames) {
+            if((game.getTeam1().equals(team1) && game.getTeam2().equals(team2))||(game.getTeam1().equals(team2) && game.getTeam2().equals(team1))) {
+                currentGame=game;
+            };
+        }
+        if (currentGame==null )
+        currentGame=new GameObject(team1,team2,goalsForTeam1,goalsForTeam2,true);
+        session.saveOrUpdate(currentGame);
         transaction.commit();
         return true;
     }
 
-    public boolean updateFinalGameResult(String team1 , String team2 ,int goalsForTeam1 ,int goalsAgainstTeam1,int goalsForTeam2,int goalsAgainstTeam2){
+    public boolean updateFinalGameResult(String team1 , String team2 ,int goalsForTeam1 ,int goalsForTeam2){
         Session session=sessionFactory.openSession();
         Transaction transaction=session.beginTransaction();
-        GameObject game=new GameObject(findTeamIdByName(team1),findTeamIdByName(team2),goalsForTeam1,goalsAgainstTeam1,goalsForTeam2,goalsAgainstTeam2,false);
+        GameObject game=new GameObject(team1,team2,goalsForTeam1,goalsForTeam2,false);
         session.saveOrUpdate(game);
         transaction.commit();
         GameResult gameResult=null;
-        if (goalsForTeam1==goalsAgainstTeam2){
+        if (goalsForTeam1==goalsForTeam2){
             gameResult=GameResult.DRAWN;
         } else
             gameResult=GameResult.WIN;
 
-         if (goalsForTeam1 - goalsAgainstTeam1 > goalsForTeam2 - goalsAgainstTeam2){
-            updateTeamResult(team1,goalsForTeam1,goalsAgainstTeam1,gameResult);
-            updateTeamResult(team2,goalsForTeam2,goalsAgainstTeam2,GameResult.LOSE);
+         if (goalsForTeam1 > goalsForTeam2 ){
+            updateTeamResult(team1,goalsForTeam1,goalsForTeam2,gameResult);
+            updateTeamResult(team2,goalsForTeam2,goalsForTeam1,GameResult.LOSE);
         }else{
-            updateTeamResult(team1,goalsForTeam1,goalsAgainstTeam1,GameResult.LOSE);
-            updateTeamResult(team2,goalsForTeam2,goalsAgainstTeam2,gameResult);
+            updateTeamResult(team1,goalsForTeam1,goalsForTeam2,GameResult.LOSE);
+            updateTeamResult(team2,goalsForTeam2,goalsForTeam1,gameResult);
         }
         return true;
     }
+
+
+//    public GameObject findLiveGameByTeamsName(String team1 , String team2) {
+//        return (GameObject) sessionFactory.openSession().createQuery("FROM GameObject WHERE ((team1 =: team1 AND team2 =: team2) OR (team1 =: team2 AND team2 =: team1 ) AND (isLive := true ))").setParameter("name",name).list().get(0);
+//    }
 }
 
 

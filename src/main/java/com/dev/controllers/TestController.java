@@ -35,15 +35,6 @@ public class TestController {
     public void init() {
     }
 
-
-
-//    @RequestMapping(value = "/get-all-users", method = {RequestMethod.GET, RequestMethod.POST})
-//    public List<User> getAllUsers () {
-//        List<User> allUsers = persist.getAllUsers();
-//        return allUsers;
-//    }
-
-
     @RequestMapping(value = "/sign-in", method = {RequestMethod.POST, RequestMethod.GET})
     public BasicResponse signIn(String username, String password) {
         BasicResponse basicResponse=null;
@@ -71,17 +62,17 @@ public class TestController {
 
     }
     @RequestMapping(value = "/add-new-game",method = {RequestMethod.POST})
-    public boolean addNewGame(String team1, String team2, int team1GoalsFor, int team1Against, int team2GoalsFor, int team2Against) {
-       return persist.addToGameTable(team1,team2,team1GoalsFor,team1Against,team2GoalsFor,team2Against);
+    public boolean addNewGame(String team1, String team2, int team1GoalsFor, int team2GoalsFor) {
+       return persist.addToGameTable(team1,team2,team1GoalsFor,team2GoalsFor);
 
     }
    @RequestMapping(value = "/update-live-game",method = RequestMethod.POST)
-    public boolean updateGame(String team1, String team2, int team1GoalsFor, int team1Against, int team2GoalsFor, int team2Against){
-        return persist.updateLiveGame(team1,team2,team1GoalsFor,team1Against,team2GoalsFor,team2Against);
+    public boolean updateGame(String team1, String team2, int team1GoalsFor, int team2GoalsFor){
+        return persist.updateLiveGame(team1,team2,team1GoalsFor,team2GoalsFor);
    }
-    @RequestMapping(value = "/update-final-game",method = {RequestMethod.POST,RequestMethod.GET})
-    public boolean updateFinalGameResult(String team1, String team2, int team1GoalsFor, int team1Against, int team2GoalsFor, int team2Against){
-        return persist.updateFinalGameResult(team1,team2,team1GoalsFor,team1Against,team2GoalsFor,team2Against);
+    @RequestMapping(value = "/update-final-game",method = {RequestMethod.POST})
+    public boolean updateFinalGameResult(String team1, String team2, int team1GoalsFor, int team2GoalsFor){
+        return persist.updateFinalGameResult(team1,team2,team1GoalsFor,team2GoalsFor);
     }
 
 
@@ -90,15 +81,12 @@ public class TestController {
         return persist.getGamesByStatus(true);
     }
 
-    @RequestMapping(value = "/get-all-finished-games",method = {RequestMethod.POST,RequestMethod.GET})
+    @RequestMapping(value = "/get-all-finished-games",method = {RequestMethod.GET})
     public List<GameObject> getAllFinishedGames(){
         return persist.getGamesByStatus(false);
     }
 
-    @RequestMapping(value = "/team-name-by-id",method = {RequestMethod.GET})
-    public String getTeamNameById (int id){
-        return persist.findTeamNameById(id);
-    }
+
 
 
 }
