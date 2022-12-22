@@ -226,9 +226,7 @@ public class Persist {
           if ( !(teamsInGames.contains(team1) ))
                 teamsInGames.add(team1);
                if ( !(teamsInGames.contains(team2)))
-
                 teamsInGames.add(team2);
-
         }
         return teamsInGames;
     }
