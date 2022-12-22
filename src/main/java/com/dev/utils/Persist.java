@@ -173,16 +173,14 @@ public class Persist {
         transaction.commit();
         GameResult gameResult=null;
         if (goalsForTeam1==goalsForTeam2){
-            gameResult=GameResult.DRAWN;
-        } else
-            gameResult=GameResult.WIN;
-
-         if (goalsForTeam1 > goalsForTeam2 ){
-            updateTeamResult(team1,goalsForTeam1,goalsForTeam2,gameResult);
+            updateTeamResult(team1,goalsForTeam1,goalsForTeam2,GameResult.DRAWN);
+            updateTeamResult(team2,goalsForTeam2,goalsForTeam1,GameResult.DRAWN);
+        } else if (goalsForTeam1 > goalsForTeam2 ){
+            updateTeamResult(team1,goalsForTeam1,goalsForTeam2,GameResult.WIN);
             updateTeamResult(team2,goalsForTeam2,goalsForTeam1,GameResult.LOSE);
-        }else{
+        }else {
             updateTeamResult(team1,goalsForTeam1,goalsForTeam2,GameResult.LOSE);
-            updateTeamResult(team2,goalsForTeam2,goalsForTeam1,gameResult);
+            updateTeamResult(team2,goalsForTeam2,goalsForTeam1,GameResult.WIN);
         }
         return true;
     }

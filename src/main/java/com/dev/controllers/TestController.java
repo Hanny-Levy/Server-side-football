@@ -89,6 +89,10 @@ public class TestController {
             return true;
         }
 
+    @RequestMapping (value = "/get-all-games", method = {RequestMethod.GET})
+    public List<GameObject> getAllGames(){
+        return persist.getAllGames();
+    }
 
 
 }
