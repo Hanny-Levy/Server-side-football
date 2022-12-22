@@ -215,6 +215,28 @@ public class Persist {
 
 
 
+
+    public List<TeamObject> getAllTeamsInLiveGames(){
+        List<GameObject> liveGames= getGamesByStatus(true);
+        List<TeamObject> teamsInGames=new ArrayList<>();
+        for (GameObject game:liveGames) {
+            TeamObject team1 = findTeamByName(game.getTeam1());
+            TeamObject team2 = findTeamByName(game.getTeam2());
+          if ( !(teamsInGames.contains(team1) ))
+                teamsInGames.add(team1);
+               if ( !(teamsInGames.contains(team2)))
+
+                teamsInGames.add(team2);
+
+        }
+        return teamsInGames;
+    }
+
+
+
+
+
+
 }
 
 

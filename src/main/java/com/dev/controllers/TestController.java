@@ -49,7 +49,6 @@ public class TestController {
                 basicResponse = new BasicResponse(false, 2);
             }
         } else {
-
             basicResponse = new SignInReponse(true, null, user);
         }
         return basicResponse;
