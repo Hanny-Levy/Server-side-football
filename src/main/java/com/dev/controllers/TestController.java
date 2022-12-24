@@ -86,4 +86,9 @@ public class TestController {
         return persist.getAllTeamsInLiveGames();
     }
 
+    @RequestMapping (value = "/get-All-Games", method = {RequestMethod.GET})
+    public List<GameObject> getAllGames(){
+        return persist.getAllGames();
+    }
+
 }
