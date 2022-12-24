@@ -1,4 +1,3 @@
-
 package com.dev.utils;
 
 import com.dev.objects.GameObject;
@@ -150,14 +149,14 @@ public class Persist {
         GameObject currentGame =null ;
         List <GameObject> liveGames= getGamesByStatus(true);
         for (GameObject game: liveGames) {
-            if((game.getTeam1().equals(team1) && game.getTeam2().equals(team2))||(game.getTeam1().equals(team2) && game.getTeam2().equals(team1))) {
+            if((game.getTeam1().getName().equals(team1) && game.getTeam2().getName().equals(team2))||(game.getTeam1().getName().equals(team2) && game.getTeam2().getName().equals(team1))) {
                 currentGame=game;
                 currentGame.setTeam1GoalsFor(goalsForTeam1);
                 currentGame.setTeam2GoalsFor(goalsForTeam2);
             };
         }
         if (currentGame==null )
-        currentGame=new GameObject(team1,team2,goalsForTeam1,goalsForTeam2,true);
+        currentGame=new GameObject( findTeamByName(team1), findTeamByName(team2),goalsForTeam1,goalsForTeam2,true);
         session.saveOrUpdate(currentGame);
         transaction.commit();
         return true;
@@ -167,9 +166,13 @@ public class Persist {
         Session session=sessionFactory.openSession();
         Transaction transaction=session.beginTransaction();
         GameObject game=findGameByTeamsNames(team1,team2,goalsForTeam1,goalsForTeam2);
-        game.setLive(false);
-        game.setTeam1GoalsFor(goalsForTeam1);
-        game.setTeam2GoalsFor(goalsForTeam2);
+        if (game==null){
+            game=new GameObject(findTeamByName(team1),findTeamByName(team2),goalsForTeam1,goalsForTeam2,false);
+        }else {
+            game.setLive(false);
+            game.setTeam1GoalsFor(goalsForTeam1);
+            game.setTeam2GoalsFor(goalsForTeam2);
+        }
         session.saveOrUpdate(game);
         transaction.commit();
         GameResult gameResult=null;
@@ -191,10 +194,10 @@ public class Persist {
         List <GameObject> games=getAllGames();
         GameObject currentGame=null;
         for (GameObject game: games) {
-            if (game.getTeam1().equals(team1) && (game.getTeam1GoalsFor()==goalsForTeam1) && (game.getTeam2GoalsFor()==goalsForTeam2) ){
+            if (game.getTeam1().getName().equals(team1) && (game.getTeam1GoalsFor()==goalsForTeam1) && (game.getTeam2GoalsFor()==goalsForTeam2) ){
             currentGame=game;
             break;
-            }else if (game.getTeam2().equals(team2) && (game.getTeam1GoalsFor()==goalsForTeam2) && (game.getTeam2GoalsFor()==goalsForTeam1)){
+            }else if (game.getTeam2().getName().equals(team2) && (game.getTeam1GoalsFor()==goalsForTeam2) && (game.getTeam2GoalsFor()==goalsForTeam1)){
                 currentGame=game;
                 break;
             }
@@ -213,16 +216,12 @@ public class Persist {
     }
 
 
-
-
-
-
     public List<TeamObject> getAllTeamsInLiveGames(){
         List<GameObject> liveGames= getGamesByStatus(true);
         List<TeamObject> teamsInGames=new ArrayList<>();
         for (GameObject game:liveGames) {
-            TeamObject team1 = findTeamByName(game.getTeam1());
-            TeamObject team2 = findTeamByName(game.getTeam2());
+            TeamObject team1 = game.getTeam1();
+            TeamObject team2 = game.getTeam2();
           if ( !(teamsInGames.contains(team1) ))
                 teamsInGames.add(team1);
                if ( !(teamsInGames.contains(team2)))

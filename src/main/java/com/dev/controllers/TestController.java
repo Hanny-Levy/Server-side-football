@@ -1,8 +1,6 @@
 package com.dev.controllers;
-
 import com.dev.objects.GameObject;
 import com.dev.objects.TeamObject;
-
 import com.dev.objects.UserObject;
 import com.dev.responses.BasicResponse;
 import com.dev.responses.SignInReponse;
@@ -12,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.annotation.PostConstruct;
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
@@ -26,7 +23,6 @@ public class TestController {
 
     @Autowired
     public Utils utils;
-
 
     @Autowired
     private Persist persist;
@@ -54,11 +50,9 @@ public class TestController {
         return basicResponse;
     }
 
-
     @RequestMapping(value = "/getAllTeams", method = RequestMethod.GET)
     public List<TeamObject> getAllTeams() {
         return persist.getTeams();
-
     }
 
     @RequestMapping(value = "/update-live-game", method = RequestMethod.POST)
@@ -70,7 +64,6 @@ public class TestController {
     public boolean updateFinalGameResult(String team1, String team2, int team1GoalsFor, int team2GoalsFor) {
         return persist.updateFinalGameResult(team1, team2, team1GoalsFor, team2GoalsFor);
     }
-
 
     @RequestMapping(value = "/get-all-live-games", method = {RequestMethod.GET})
     public List<GameObject> getAllLiveGames() {
@@ -93,8 +86,4 @@ public class TestController {
         return persist.getAllTeamsInLiveGames();
     }
 
-
 }
-
-
-

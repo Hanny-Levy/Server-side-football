@@ -10,21 +10,19 @@ public class GameObject {
     @Column
     private int id;
 
+    @ManyToOne
+    @JoinColumn (name = "team1_name")
+    private TeamObject team1;
 
-    @JoinColumn (name = "team_name_1")
-    private String team1;
 
+    @ManyToOne
+    @JoinColumn (name = "team2_name")
+    private TeamObject team2;
 
-
-    @JoinColumn (name = "team_id_2")
-
-    private String team2;
-//
 //    @ManyToOne
 //    @JoinColumn(name = "teamId")
 //    @Column
 //    private TeamObject team1;
-
 //    @OneToMany
 //    @
 //    @Column
@@ -42,7 +40,7 @@ public class GameObject {
     private boolean isLive;
 
 
-    public GameObject( String team1, String team2, int team1GoalsFor, int team2GoalsFor, boolean isLive) {
+    public GameObject( TeamObject team1, TeamObject team2, int team1GoalsFor, int team2GoalsFor, boolean isLive) {
         this.team1 = team1;
         this.team2 = team2;
         this.team1GoalsFor = team1GoalsFor;
@@ -103,19 +101,27 @@ public class GameObject {
         isLive = live;
     }
 
-    public String getTeam1() {
+    public TeamObject getTeam1() {
         return team1;
     }
 
-    public void setTeam1(String team1) {
+    public void setTeam1(TeamObject team1) {
         this.team1 = team1;
     }
 
-    public String getTeam2() {
+    public TeamObject getTeam2() {
         return team2;
     }
 
-    public void setTeam2(String team2) {
+    public void setTeam2(TeamObject team2) {
         this.team2 = team2;
+    }
+
+    public void setTeam1Against(int team1Against) {
+        this.team1Against = team1Against;
+    }
+
+    public void setTeam2Against(int team2Against) {
+        this.team2Against = team2Against;
     }
 }

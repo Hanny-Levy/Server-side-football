@@ -7,11 +7,11 @@ import javax.persistence.*;
 
 
 public class TeamObject {
-    @Id
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private int id;
-
+    @Id
     @Column
     private String name;
 
