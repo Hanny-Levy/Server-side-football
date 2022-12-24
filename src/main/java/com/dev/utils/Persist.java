@@ -17,6 +17,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Component
@@ -39,6 +40,7 @@ public class Persist {
             System.out.println();
             addTeams();
             addAdminUser();
+           getUpdatedTeamsListWithLiveResult();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -230,9 +232,42 @@ public class Persist {
         return teamsInGames;
     }
 
+    public HashSet<TeamObject> getUpdatedTeamsListWithLiveResult(){
+        HashSet<TeamObject> updatedTeams = new HashSet<>();
+        TeamObject team1=null;
+        TeamObject team2=null;
+        List<GameObject > liveGames=getGamesByStatus(true);
+        for (GameObject game: liveGames ) {
+            team1=game.getTeam1();
+            team2=game.getTeam2();
+            if (game.getTeam1GoalsFor()>game.getTeam2GoalsFor()){
+                team1.setGamesWon(team1.getGamesWon()+1);
+                team2.setGamesLost(team2.getGamesLost()+1);
+            }else if (game.getTeam1GoalsFor()>game.getTeam2GoalsFor()){
+                team2.setGamesWon(team2.getGamesWon()+1);
+                team1.setGamesLost(team1.getGamesLost()+1);
+            }else {
+                team1.setGameDrawn(team1.getGameDrawn()+1);
+                team2.setGameDrawn(team2.getGameDrawn()+1);
+            }
+            updatedTeams.add(team1);
+            updatedTeams.add(team2);
+        }
+        for (TeamObject current: getTeams() ) {
+            updatedTeams.add(current);
+        }
+        printSet(updatedTeams);
+        return updatedTeams;
+    }
 
-
-
+    public void printSet(HashSet<TeamObject> teamObjects){
+        for (TeamObject team: teamObjects  ) {
+            System.out.println(team.getName());
+            System.out.println(team.getGamesWon());
+            System.out.println(team.getGamesLost());
+            System.out.println(team.getGameDrawn());
+        }
+    }
 
 
 }

@@ -19,15 +19,6 @@ public class GameObject {
     @JoinColumn (name = "team2_name")
     private TeamObject team2;
 
-//    @ManyToOne
-//    @JoinColumn(name = "teamId")
-//    @Column
-//    private TeamObject team1;
-//    @OneToMany
-//    @
-//    @Column
-//    private TeamObject team2;
-
     @Column
     private int team1GoalsFor;
     @Column

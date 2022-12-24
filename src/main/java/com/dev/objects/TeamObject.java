@@ -12,7 +12,6 @@ public class TeamObject {
     @Column
     private int id;
 
-
     @Column
     private String name;
 
@@ -98,5 +97,10 @@ public class TeamObject {
 
     public void setGoalAgainst(int goalAgainst) {
         this.goalAgainst = goalAgainst;
+    }
+
+    public Boolean equals (TeamObject otherTeam){
+        return  (otherTeam.getName().equals(this.name));
+
     }
 }
