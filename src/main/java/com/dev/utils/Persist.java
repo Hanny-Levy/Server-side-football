@@ -25,6 +25,7 @@ public class Persist {
 
     private Connection connection;
     private final SessionFactory sessionFactory;
+    private  HashSet<TeamObject> teamsInLive;
 
     @Autowired
     public Persist(SessionFactory sf) {
@@ -34,17 +35,23 @@ public class Persist {
     @PostConstruct
     public void createConnectionToDatabase() {
         try {
+
             this.connection = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/football_project", "root", "1234");
             System.out.println("Successfully connected to DB");
             System.out.println();
             addTeams();
             addAdminUser();
-           getUpdatedTeamsListWithLiveResult();
+            teamsInLive=new HashSet<>();
+            initTeamsLive();
+            getTeamsListWithLiveResult();
+
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
 
     public boolean usernameExist(String username) {
         boolean exist;
@@ -139,19 +146,16 @@ public class Persist {
     }
 
 
-//    public boolean addToGameTable(String team1 , String team2 ,int goalsForTeam1 ,int goalsForTeam2){
-//        GameObject game=new GameObject(team1,team2,goalsForTeam1,goalsForTeam2,true);
-//        sessionFactory.openSession().save(game);
-//        return true;
-//    }
-
     public boolean updateLiveGame(String team1 , String team2 ,int goalsForTeam1 ,int goalsForTeam2){
         Session session=sessionFactory.openSession();
         Transaction transaction=session.beginTransaction();
         GameObject currentGame =null ;
+
         List <GameObject> liveGames= getGamesByStatus(true);
         for (GameObject game: liveGames) {
             if((game.getTeam1().getName().equals(team1) && game.getTeam2().getName().equals(team2))||(game.getTeam1().getName().equals(team2) && game.getTeam2().getName().equals(team1))) {
+                //updatedLiveTeamsList(game.getTeam1(),game.getTeam2(),goalsForTeam1 , goalsForTeam2);
+
                 currentGame=game;
                 currentGame.setTeam1GoalsFor(goalsForTeam1);
                 currentGame.setTeam2GoalsFor(goalsForTeam2);
@@ -161,6 +165,9 @@ public class Persist {
         currentGame=new GameObject( findTeamByName(team1), findTeamByName(team2),goalsForTeam1,goalsForTeam2,true);
         session.saveOrUpdate(currentGame);
         transaction.commit();
+
+
+
         return true;
     }
 
@@ -177,7 +184,6 @@ public class Persist {
         }
         session.saveOrUpdate(game);
         transaction.commit();
-        GameResult gameResult=null;
         if (goalsForTeam1==goalsForTeam2){
             updateTeamResult(team1,goalsForTeam1,goalsForTeam2,GameResult.DRAWN);
             updateTeamResult(team2,goalsForTeam2,goalsForTeam1,GameResult.DRAWN);
@@ -232,44 +238,115 @@ public class Persist {
         return teamsInGames;
     }
 
-    public HashSet<TeamObject> getUpdatedTeamsListWithLiveResult(){
-        HashSet<TeamObject> updatedTeams = new HashSet<>();
-        TeamObject team1=null;
-        TeamObject team2=null;
+    public boolean isTeamExist(TeamObject teamObject,List<TeamObject>updatedTeams){
+      boolean isExist=false;
+        for (int i = 0; i <updatedTeams.size() ; i++) {
+            if (updatedTeams.get(i).equals(teamObject)){
+               isExist=true;
+                break;
+            }
+        }
+        return isExist;
+    }
+    public List<TeamObject> getTeamsListWithLiveResult(){
+        List<TeamObject> updatedTeams =new ArrayList<>();
+
         List<GameObject > liveGames=getGamesByStatus(true);
         for (GameObject game: liveGames ) {
-            team1=game.getTeam1();
-            team2=game.getTeam2();
+
             if (game.getTeam1GoalsFor()>game.getTeam2GoalsFor()){
-                team1.setGamesWon(team1.getGamesWon()+1);
-                team2.setGamesLost(team2.getGamesLost()+1);
-            }else if (game.getTeam1GoalsFor()>game.getTeam2GoalsFor()){
-                team2.setGamesWon(team2.getGamesWon()+1);
-                team1.setGamesLost(team1.getGamesLost()+1);
+                game.getTeam1().setGamesWon(game.getTeam1().getGamesWon()+1);
+                game.getTeam2().setGamesLost(game.getTeam2().getGamesLost()+1);
+            }else if (game.getTeam1GoalsFor()<game.getTeam2GoalsFor()){
+                game.getTeam2().setGamesWon(game.getTeam2().getGamesWon()+1);
+                game.getTeam1().setGamesLost(game.getTeam1().getGamesLost()+1);
             }else {
-                team1.setGameDrawn(team1.getGameDrawn()+1);
-                team2.setGameDrawn(team2.getGameDrawn()+1);
+                game.getTeam1().setGameDrawn(game.getTeam1().getGameDrawn()+1);
+                game.getTeam2().setGameDrawn(game.getTeam2().getGameDrawn()+1);
             }
-            updatedTeams.add(team1);
-            updatedTeams.add(team2);
+           // updatedTeams.remove(findTeamIndex(game.getTeam1()));
+//            System.out.println("/\n"+ updatedTeams.get(findTeamIndex(game.getTeam2())).getName());
+          //  updatedTeams.remove(findTeamIndex(game.getTeam2()));
+
+            game.getTeam1().setGoalsFor(game.getTeam1().getGoalsFor()+game.getTeam1GoalsFor());
+            game.getTeam2().setGoalsFor(game.getTeam2().getGoalsFor()+game.getTeam2GoalsFor());
+            game.getTeam1().setGoalAgainst(game.getTeam1().getGoalAgainst()+game.getTeam2GoalsFor());
+            game.getTeam2().setGoalAgainst(game.getTeam2().getGoalAgainst()+game.getTeam1GoalsFor());
+
+            System.out.println("//////////////////////////first///////////////////////");
+            updatedTeams.add(game.getTeam1());
+            System.out.println(game.getTeam1().getName());
+            updatedTeams.add(game.getTeam2());
+            System.out.println(game.getTeam2().getName());
+
         }
-        for (TeamObject current: getTeams() ) {
-            updatedTeams.add(current);
+
+
+        for (TeamObject team: getTeams()) {
+//            System.out.println("--------------------before condition--------------------------");
+//            System.out.println(team.getName());
+            if (!isTeamExist(team,updatedTeams)){
+                System.out.println("********updated*********");
+                System.out.println(team.getName());
+                updatedTeams.add(team);
+
+            }
+
         }
-        printSet(updatedTeams);
+
+        //printSet(updatedTeams);
         return updatedTeams;
     }
 
-    public void printSet(HashSet<TeamObject> teamObjects){
-        for (TeamObject team: teamObjects  ) {
+    public void printSet(List<TeamObject> teamObjects){
+
+        for (TeamObject team: teamObjects ) {
             System.out.println(team.getName());
             System.out.println(team.getGamesWon());
             System.out.println(team.getGamesLost());
             System.out.println(team.getGameDrawn());
         }
     }
+    public void updatedLiveTeamsList(TeamObject team1,TeamObject team2,int goalsForTeam1 ,int goalsForTeam2){
+        if ( team1!=null && team2!=null){
+            team1.setGoalsFor(goalsForTeam1);
+            team1.setGoalAgainst(goalsForTeam2);
+            team2.setGoalsFor(goalsForTeam2);
+            team2.setGoalAgainst(goalsForTeam1);
+            if (goalsForTeam1>goalsForTeam2){
+                team1.setGamesWon(team1.getGamesWon()+1);
+                team2.setGamesLost(team2.getGamesLost()+1);
+            }else if (goalsForTeam1<goalsForTeam2){
+                team2.setGamesWon(team2.getGamesWon()+1);
+                team1.setGamesLost(team1.getGamesLost()+1);
+            }else {
+                team1.setGameDrawn(team1.getGameDrawn()+1);
+                team2.setGameDrawn(team2.getGameDrawn()+1);
+            }
+        }
+        for (TeamObject currentTeam:teamsInLive) {
+            if (team1!=null&&team2!=null)
+            if (currentTeam.getName().equals(team1.getName()) || currentTeam.getName().equals(team2.getName())){
+                teamsInLive.remove(currentTeam);
+            }
+
+        }
+        teamsInLive.add(team1);
+        teamsInLive.add(team2);
 
 
+    }
+
+    public HashSet<TeamObject> getTeamsInLive() {
+        return teamsInLive;
+    }
+
+    public void initTeamsLive(){
+        for (TeamObject team:getTeams()) {
+            teamsInLive.add(team);
+
+        }
+    }
 }
 
 

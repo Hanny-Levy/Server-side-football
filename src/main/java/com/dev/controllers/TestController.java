@@ -14,6 +14,7 @@ import javax.annotation.PostConstruct;
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -89,6 +90,14 @@ public class TestController {
     @RequestMapping (value = "/get-All-Games", method = {RequestMethod.GET})
     public List<GameObject> getAllGames(){
         return persist.getAllGames();
+    }
+    @RequestMapping (value = "/get-teams-in-games", method = {RequestMethod.GET})
+    public HashSet<TeamObject> getAllTeamsInGames(){
+        return persist.getTeamsInLive();
+    }
+    @RequestMapping (value = "/get-lives", method = {RequestMethod.GET})
+    public List<TeamObject> getLivesTeamsList(){
+        return persist.getTeamsListWithLiveResult();
     }
 
 }
