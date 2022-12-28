@@ -32,17 +32,15 @@ public class TestController {
     public void init() {
     }
 
-    @RequestMapping(value = "/sign-in", method = {RequestMethod.POST, RequestMethod.GET})
+    @RequestMapping(value = "/sign-in", method = {RequestMethod.POST})
     public BasicResponse signIn(String username, String password) {
         BasicResponse basicResponse = null;
         String token = persist.createHash(username, password);
         UserObject user = persist.isUserExist(username, token);
         if (user == null) {
             if (!persist.usernameExist(username)) {
-                //for problem with username
                 basicResponse = new BasicResponse(false, 1);
             } else {
-                //problem with password
                 basicResponse = new BasicResponse(false, 2);
             }
         } else {
@@ -51,7 +49,7 @@ public class TestController {
         return basicResponse;
     }
 
-    @RequestMapping(value = "/getAllTeams", method = RequestMethod.GET)
+    @RequestMapping(value = "/get-all-teams", method = RequestMethod.GET)
     public List<TeamObject> getAllTeams() {
         return persist.getTeams();
     }
@@ -71,33 +69,20 @@ public class TestController {
         return persist.getGamesByStatus(true);
     }
 
-    @RequestMapping(value = "/get-all-finished-games", method = {RequestMethod.GET})
-    public List<GameObject> getAllFinishedGames() {
-        return persist.getGamesByStatus(false);
-    }
-
     @RequestMapping (value = "/delete-live-game", method = {RequestMethod.POST})
         public boolean deleteLiveGame (String team1, String team2 ,int team1GoalsFor, int team2GoalsFor){
             persist.deleteGame(team1, team2 ,team1GoalsFor, team2GoalsFor);
             return true;
         }
 
-    @RequestMapping (value = "/get-All-Teams-In-Games", method = {RequestMethod.GET})
+        //get all teams in games
+    @RequestMapping (value = "/get-teams-in-games", method = {RequestMethod.GET})
     public List<TeamObject> getTeamsInGames(){
         return persist.getAllTeamsInLiveGames();
     }
 
-    @RequestMapping (value = "/get-All-Games", method = {RequestMethod.GET})
-    public List<GameObject> getAllGames(){
-        return persist.getAllGames();
-    }
-    @RequestMapping (value = "/get-teams-in-games", method = {RequestMethod.GET})
-    public HashSet<TeamObject> getAllTeamsInGames(){
-        return persist.getTeamsInLive();
-    }
-    @RequestMapping (value = "/get-lives", method = {RequestMethod.GET})
+    @RequestMapping (value = "/get-all-teams-in-lives-results", method = {RequestMethod.GET})
     public List<TeamObject> getLivesTeamsList(){
         return persist.getTeamsListWithLiveResult();
     }
-
 }
