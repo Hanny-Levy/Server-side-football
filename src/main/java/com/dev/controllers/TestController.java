@@ -11,10 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.PostConstruct;
-import javax.xml.bind.DatatypeConverter;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HashSet;
 import java.util.List;
 
 
@@ -55,12 +51,12 @@ public class TestController {
     }
 
     @RequestMapping(value = "/update-live-game", method = RequestMethod.POST)
-    public boolean updateGame(String team1, String team2, int team1GoalsFor, int team2GoalsFor) {
+    public BasicResponse updateGame(String team1, String team2, int team1GoalsFor, int team2GoalsFor) {
         return persist.updateLiveGame(team1, team2, team1GoalsFor, team2GoalsFor);
     }
 
     @RequestMapping(value = "/update-final-game", method = {RequestMethod.POST})
-    public boolean updateFinalGameResult(String team1, String team2, int team1GoalsFor, int team2GoalsFor) {
+    public BasicResponse updateFinalGameResult(String team1, String team2, int team1GoalsFor, int team2GoalsFor) {
         return persist.updateFinalGameResult(team1, team2, team1GoalsFor, team2GoalsFor);
     }
 
@@ -70,9 +66,8 @@ public class TestController {
     }
 
     @RequestMapping (value = "/delete-live-game", method = {RequestMethod.POST})
-        public boolean deleteLiveGame (String team1, String team2 ,int team1GoalsFor, int team2GoalsFor){
-            persist.deleteGame(team1, team2 ,team1GoalsFor, team2GoalsFor);
-            return true;
+        public BasicResponse deleteLiveGame (String team1, String team2 ,int team1GoalsFor, int team2GoalsFor){
+          return   persist.deleteGame(team1, team2 ,team1GoalsFor, team2GoalsFor);
         }
 
         //get all teams in games

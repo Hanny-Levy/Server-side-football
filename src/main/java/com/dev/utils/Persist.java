@@ -4,6 +4,7 @@ import com.dev.objects.GameObject;
 import com.dev.objects.GameResult;
 import com.dev.objects.TeamObject;
 import com.dev.objects.UserObject;
+import com.dev.responses.BasicResponse;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -20,7 +21,6 @@ import java.util.List;
 @Component
 public class Persist {
 
-    private Connection connection;
     private final SessionFactory sessionFactory;
 
     @Autowired
@@ -32,7 +32,7 @@ public class Persist {
     public void createConnectionToDatabase() {
         try {
 
-            this.connection = DriverManager.getConnection(
+            Connection connection = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/football_project", "root", "1234");
             System.out.println("Successfully connected to DB");
             System.out.println();
@@ -56,8 +56,8 @@ public class Persist {
 
     public UserObject isUserExist (String username,String token) {
         UserObject user = null;
-        List usersByName = sessionFactory.openSession().createQuery("FROM UserObject WHERE username=:username").setParameter("username",username).list();
-        List userByToken= sessionFactory.openSession().createQuery("FROM UserObject WHERE token=: token").setParameter("token",token).list();
+        List <UserObject> usersByName = sessionFactory.openSession().createQuery("FROM UserObject WHERE username=:username").setParameter("username",username).list();
+        List <UserObject> userByToken= sessionFactory.openSession().createQuery("FROM UserObject WHERE token=: token").setParameter("token",token).list();
        if (usersByName.size()!=0 && userByToken.size()!=0){
            user= (UserObject) usersByName.get(0);
        }
@@ -68,8 +68,8 @@ public class Persist {
         String[] teamsNames = new String[]{"AFC Bournemouth", "Arsenal", "Brentford", "Chelsea", "Everton", "Fulham", "Leeds United", "Leicester City", "Liverpool", "Manchester City", "Manchester United", "West Ham United"};
         List<TeamObject> teamObjects = sessionFactory.openSession().createQuery("FROM TeamObject ").list();
         if (teamObjects.size() == 0)
-            for (int i = 0; i < teamsNames.length; i++) {
-                sessionFactory.openSession().save(new TeamObject(teamsNames[i]));
+            for (String teamsName : teamsNames) {
+                sessionFactory.openSession().save(new TeamObject(teamsName));
             }
     }
 
@@ -103,7 +103,7 @@ public class Persist {
         return teamObjectList;
     }
 
-    public boolean updateTeamResult(String team ,int goalsFor ,int goalsAgainst,GameResult gameResult){
+    public void updateTeamResult(String team , int goalsFor , int goalsAgainst, GameResult gameResult){
         Session session=sessionFactory.openSession();
         Transaction transaction=session.beginTransaction();
         TeamObject currentTeam= findTeamByName(team);
@@ -122,7 +122,6 @@ public class Persist {
         }
         session.saveOrUpdate(currentTeam);
         transaction.commit();
-        return true;
     }
 
 
@@ -140,11 +139,11 @@ public class Persist {
     }
 
 
-    public boolean updateLiveGame(String team1 , String team2 ,int goalsForTeam1 ,int goalsForTeam2){
+    public BasicResponse updateLiveGame(String team1 , String team2 ,int goalsForTeam1 ,int goalsForTeam2){
+        BasicResponse basicResponse=new BasicResponse(false,null);
         Session session=sessionFactory.openSession();
         Transaction transaction=session.beginTransaction();
         GameObject currentGame =null ;
-
         List <GameObject> liveGames= getGamesByStatus(true);
         for (GameObject game: liveGames) {
             if((game.getTeam1().getName().equals(team1) && game.getTeam2().getName().equals(team2))||(game.getTeam1().getName().equals(team2) && game.getTeam2().getName().equals(team1))) {
@@ -153,17 +152,19 @@ public class Persist {
                 currentGame.setTeam2GoalsFor(goalsForTeam2);
             };
         }
-        if (currentGame==null )
-        currentGame=new GameObject( findTeamByName(team1), findTeamByName(team2),goalsForTeam1,goalsForTeam2,true);
+        if (currentGame==null){
+            currentGame=new GameObject( findTeamByName(team1), findTeamByName(team2),goalsForTeam1,goalsForTeam2,true);
+        }
         session.saveOrUpdate(currentGame);
         transaction.commit();
+        basicResponse.setSuccess(true);
+        return basicResponse;
 
 
-
-        return true;
     }
 
-    public boolean updateFinalGameResult(String team1 , String team2 ,int goalsForTeam1 ,int goalsForTeam2){
+    public BasicResponse updateFinalGameResult(String team1 , String team2 ,int goalsForTeam1 ,int goalsForTeam2){
+       BasicResponse basicResponse=new BasicResponse(false,null);
         Session session=sessionFactory.openSession();
         Transaction transaction=session.beginTransaction();
         GameObject game=findGameByTeamsNames(team1,team2,goalsForTeam1,goalsForTeam2);
@@ -186,7 +187,8 @@ public class Persist {
             updateTeamResult(team1,goalsForTeam1,goalsForTeam2,GameResult.LOSE);
             updateTeamResult(team2,goalsForTeam2,goalsForTeam1,GameResult.WIN);
         }
-        return true;
+        basicResponse.setSuccess(true);
+        return basicResponse;
     }
 
 
@@ -205,14 +207,15 @@ public class Persist {
         return currentGame;
     }
 
-    public boolean deleteGame (String team1 ,String team2 ,int team1GoalsFor , int team2GoalsFor){
+    public BasicResponse deleteGame (String team1 ,String team2 ,int team1GoalsFor , int team2GoalsFor){
+        BasicResponse basicResponse=new BasicResponse(false,null);
         GameObject game=findGameByTeamsNames(team1,team2,team1GoalsFor,team2GoalsFor);
-        int id = game.getId();
         Session session=sessionFactory.openSession();
         session.delete(game);
         Transaction transaction = session.beginTransaction();
         transaction.commit();
-        return true;
+        basicResponse.setSuccess(true);
+        return basicResponse;
     }
 
 
@@ -232,9 +235,9 @@ public class Persist {
 
     public boolean isTeamExist(TeamObject teamObject,List<TeamObject>updatedTeams){
       boolean isExist=false;
-        for (int i = 0; i <updatedTeams.size() ; i++) {
-            if (updatedTeams.get(i).equals(teamObject)){
-               isExist=true;
+        for (TeamObject updatedTeam : updatedTeams) {
+            if (updatedTeam.equals(teamObject)) {
+                isExist = true;
                 break;
             }
         }
@@ -242,7 +245,6 @@ public class Persist {
     }
     public List<TeamObject> getTeamsListWithLiveResult(){
         List<TeamObject> updatedTeams =new ArrayList<>();
-
         List<GameObject > liveGames=getGamesByStatus(true);
         for (GameObject game: liveGames ) {
 
@@ -261,13 +263,10 @@ public class Persist {
             game.getTeam2().setGoalsFor(game.getTeam2().getGoalsFor()+game.getTeam2GoalsFor());
             game.getTeam1().setGoalAgainst(game.getTeam1().getGoalAgainst()+game.getTeam2GoalsFor());
             game.getTeam2().setGoalAgainst(game.getTeam2().getGoalAgainst()+game.getTeam1GoalsFor());
-
             updatedTeams.add(game.getTeam1());
             updatedTeams.add(game.getTeam2());
 
         }
-
-
         for (TeamObject team: getTeams()) {
             if (!isTeamExist(team,updatedTeams)){
                 updatedTeams.add(team);
